@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<meta charset="UTF-8">
+		<title>用户列表</title>
+	</head>
+
+	<body>
+
+		<table border="1">
+			<thead>
+				<th>序号</th>
+				<th>姓名</th>
+				<th>年龄</th>
+				<th>操作</th>
+			</thead>
+			<tbody id="userTbody">
+			</tbody>
+		</table>
+
+		<script src="http://libs.baidu.com/jquery/2.0.0/jquery.min.js"></script>
+		<script type="text/javascript">
+			$(function() {
+				get();
+
+				//加载数据到表格
+				function get() {
+					$.ajax({
+						url: "/user/get",
+						type: "get",
+						dataType: "text",
+						success: function(data) {
+							//加载数据
+							$("#userTbody").children().remove();
+							var jsonData = JSON.parse(data);
+							for(var i = 1; i < jsonData.length + 1; i++) {
+								var $tr = $('<tr>' +
+									'<td>' + i + '</td>' +
+									'<td>' + jsonData[i-1].Name + '</td>' +
+									'<td>' + jsonData[i-1].Age + '</td>' +
+									'</tr>');
+								var $td = $('<td><input type="button" id="' + jsonData[i-1].ID + '" value="删除" /></td>').click(function() {
+									deletee($(this));
+								});
+								$td.appendTo($tr);
+								$tr.appendTo($("#userTbody"));
+							}
+						},
+						error: function(XHR) {
+							alert(XHR.status);
+						}
+					});
+				}
+
+				//删除数据
+				function deletee($this) {
+					console.log($this.children().attr("id"));
+					$.ajax({
+						url: "/user/delete?IDs="+$this.children().attr("id")+"",
+						type: "post",
+						/*data: {
+							"IDs": $this.children().attr("id")
+						},*/
+						dataType: "text",
+						success: function(data) {
+							alert(data);
+							get();
+						},
+						error: function(XHR) {
+							alert(XHR.status);
+						}
+					});
+				}
+			})
+		</script>
+	</body>
+
+</html>
